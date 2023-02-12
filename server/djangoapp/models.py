@@ -43,10 +43,8 @@ class CarModel(models.Model):
     year = models.DateField()
 
     def __str__(self):
-        return "Name: " + self.name + ", " + \
-               "Dealer ID: " + str(self.dealer_id) + ", " + \
-               "Type: " + self.car_type + ", " + \
-               "Year: " + str(self.year.year)
+        return "Name: " + self.name + "," + \
+               "Model: " + self.car_model
 
 
 
@@ -77,18 +75,16 @@ class CarDealer:
 
 # <HINT> Create a plain Python class `DealerReview` to hold review data
 class DealerReview:
-    def __init__(self, dealership, name, purchase, review, purchase_date, car_make, car_model, car_year, sentiment, id):
+    def __init__(self, dealership, name, purchase, review):
         self.dealership = dealership
         self.name = name
         self.purchase = purchase
         self.review = review
-        self.purchase_date = purchase_date
-        self.car_make = car_make
-        self.car_model = car_model
-        self.car_year = car_year
-        self.sentiment = sentiment
-        self.id = id
-
+        self.purchase_date = ""
+        self.car_make = ""
+        self.car_model = ""
+        self.car_year = ""
+        self.sentiment = ""
+        self.id = ""
     def __str__(self):
-        return "Review: " + self.review + ", " + \
-               "Sentiment: " + self.sentiment
+        return "Dealer Review: " + self.review +"("+ self.sentiment+ ")"

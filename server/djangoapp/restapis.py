@@ -1,6 +1,6 @@
 import requests
 import json
-from .models import CarDealer
+from .models import CarDealer, DealerReview
 from requests.auth import HTTPBasicAuth
 
 
@@ -80,7 +80,7 @@ def get_dealer_reviews_from_cf(url, **kwargs):
     else:
         json_result = get_request(url)
     if json_result:
-        reviews = json_result["body"]["data"]["docs"]
+        reviews = json_result["data"]["docs"]
         for dealer_review in reviews:
             review_obj = DealerReview(dealership=dealer_review["dealership"],
                                    name=dealer_review["name"],
@@ -96,9 +96,9 @@ def get_dealer_reviews_from_cf(url, **kwargs):
                 review_obj.car_model = dealer_review["car_model"]
             if "car_year" in dealer_review:
                 review_obj.car_year = dealer_review["car_year"]
-            sentiment = analyze_review_sentiments(review_obj.review)
-            print(sentiment)
-            review_obj.sentiment = sentiment
+            # sentiment = analyze_review_sentiments(review_obj.review)
+            # print(sentiment)
+            # review_obj.sentiment = sentiment
             results.append(review_obj)
     return results
 
@@ -107,6 +107,15 @@ def get_dealer_reviews_from_cf(url, **kwargs):
 # def analyze_review_sentiments(text):
 # - Call get_request() with specified arguments
 # - Get the returned sentiment label such as Positive or Negative
-
+# def analyze_review_sentiments(text):
+#     url = "<INSERT_URL_HERE>"
+#     api_key = "<INSERT_KEY_HERE>"
+#     authenticator = IAMAuthenticator(api_key)
+#     natural_language_understanding = NaturalLanguageUnderstandingV1(version='2021-08-01',authenticator=authenticator)
+#     natural_language_understanding.set_service_url(url)
+#     response = natural_language_understanding.analyze( text=text+"hello hello hello",features=Features(sentiment=SentimentOptions(targets=[text+"hello hello hello"]))).get_result()
+#     label=json.dumps(response, indent=2)
+#     label = response['sentiment']['document']['label']
+#     return(label)
 
 
