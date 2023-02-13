@@ -44,12 +44,13 @@ class CarModel(models.Model):
 
     def __str__(self):
         return "Name: " + self.name + "," + \
-               "Model: " + self.car_model
+               "Model: " + self.car_type
 
 
 
 # <HINT> Create a plain Python class `CarDealer` to hold dealer data
 class CarDealer:
+
     def __init__(self, address, city, full_name, id, lat, long, short_name, st, zip):
         # Dealer address
         self.address = address
@@ -87,4 +88,4 @@ class DealerReview:
         self.sentiment = ""
         self.id = ""
     def __str__(self):
-        return "Dealer Review: " + self.review +"("+ self.sentiment+ ")"
+        return "Dealer Review: " + self.review +" ("+ self.sentiment+ ")"

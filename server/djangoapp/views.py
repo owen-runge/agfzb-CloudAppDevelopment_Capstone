@@ -104,19 +104,72 @@ def get_dealerships(request):
 
 
 # Create a `get_dealer_details` view to render the reviews of a dealer
+# def get_dealer_details(request, dealer_id):
+#     if request.method == "GET":
+#         context = {}
+#         url = "https://us-south.functions.appdomain.cloud/api/v1/web/cbe0fb6e-9956-4ee6-94de-4294bb219704/dealership-package/get-review"
+#         url2 = "https://us-south.functions.appdomain.cloud/api/v1/web/cbe0fb6e-9956-4ee6-94de-4294bb219704/dealership-package/get-dealership"
+#         reviews = get_dealer_reviews_from_cf(url, id=dealer_id)
+#         context['reviews'] = reviews
+#         dealer = get_dealer_by_id_from_cf(url2, dealer_id)
+#         context['dealer'] = dealer
+#         return render(request, 'djangoapp/dealer_details.html', context)
+
 def get_dealer_details(request, dealer_id):
     if request.method == "GET":
         context = {}
-        url = "https://us-south.functions.appdomain.cloud/api/v1/web/cbe0fb6e-9956-4ee6-94de-4294bb219704/dealership-package/get-review"
-        url2 = "https://us-south.functions.appdomain.cloud/api/v1/web/cbe0fb6e-9956-4ee6-94de-4294bb219704/dealership-package/get-dealership"
-        reviews = get_dealer_reviews_from_cf(url, id=dealer_id)
-        context['reviews'] = reviews
-        dealer = get_dealer_by_id_from_cf(url2, dealer_id)
-        context['dealer'] = dealer
-        return render(request, 'djangoapp/dealer_details.html', context)
+        dealer_url = "https://us-south.functions.appdomain.cloud/api/v1/web/cbe0fb6e-9956-4ee6-94de-4294bb219704/dealership-package/get-dealership"
+        dealer = get_dealer_by_id_from_cf(dealer_url, id=dealer_id)
+        context["dealer"] = dealer
+
+        review_url = "https://us-south.functions.appdomain.cloud/api/v1/web/cbe0fb6e-9956-4ee6-94de-4294bb219704/dealership-package/get-review"
+        reviews = get_dealer_reviews_from_cf(review_url, id=dealer_id)
+        print(reviews)
+        context["reviews"] = reviews
+
+        return HttpResponse(reviews)
+        # return render(request, 'djangoapp/dealer_details.html', context)
 
 
 # Create a `add_review` view to submit a review
-# def add_review(request, dealer_id):
-# ...
+def add_review(request, dealer_id):
+    context = {}
+    dealer_url = "https://us-south.functions.appdomain.cloud/api/v1/web/cbe0fb6e-9956-4ee6-94de-4294bb219704/dealership-package/get-dealership"
+    dealer = get_dealer_by_id_from_cf(dealer_url, id=dealer_id)
+    context['dealer'] = dealer
+    if request.method == "GET":
+        cars = CarModel.objects.all()
+        print(cars)
+        context['cars'] = cars
+
+        return HttpResponse(cars)
+        # return render(request, 'djangoapp/add_review.html', context)
+    elif request.method == 'POST':
+        if request.user.is_authenticated:
+            username = request.user.username
+            print(request.POST)
+            payload = dict()
+            car_id = request.POST["car"]
+            car = CarModel.objects.get(pk=car_id)
+            payload["time"] = datetime.utcnow().isoformat()
+            payload["name"] = username
+            payload["dealership"] = dealer_id
+            payload["id"] = dealer_id
+            payload["review"] = request.POST["content"]
+            payload["purchase"] = False
+            if "purchasecheck" in request.POST:
+                if request.POST["purchasecheck"] == 'on':
+                    payload["purchase"] = True
+            payload["purchase_date"] = request.POST["purchasedate"]
+            payload["car_make"] = car.CarMake.name
+            payload["car_model"] = car.name
+            payload["car_year"] = int(car.car_year.strftime("%Y"))
+
+            new_payload = {}
+            new_payload["review"] = payload
+            review_post_url = "https://us-south.functions.appdomain.cloud/api/v1/web/cbe0fb6e-9956-4ee6-94de-4294bb219704/dealership-package/post-review"
+            post_request(review_post_url, new_payload, id=dealer_id)
+        
+        return HttpResponse(new_payload)
+        # return redirect("djangoapp:dealer_details", id=id)
 
