@@ -11,6 +11,75 @@
 
 </head>
     <body>
-    <!--Add review form here -->
+        <!-- nav bar -->
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">Best Cars</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'djangoapp:about' %}">About</a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link" href="{% url 'djangoapp:contact' %}">Contact</a>
+                  </li>
+                </ul>
+            </div>
+            {% if user.is_authenticated %}
+            <form class="form-inline">
+                <a class="h6 mr-2 text-light">{{ user.username }}</a>
+                <a class="btn btn-outline-danger btn-sm" type="button" href="{% url 'djangoapp:logout' %}">Logout</a>
+            </form>
+            {% else %}
+            <form class='form-inline' action="{% url 'djangoapp:login' %}" method='post'>
+                {% csrf_token %}
+                <input type='text' id='username' name='username' placeholder="username">
+                <input type='password' id='psw' name='psw' placeholder='password'>
+                <button class='btn btn-primary' type='submit'>Login</button>
+                <a class='btn btn-outline-success btn-sm' type='submit' href="{% url 'djangoapp:registration' %}">Sign Up</a>
+            </form>
+            {% endif %}
+        </nav>
+
+        <!--Add review form here -->
+        <form action="{% url 'djangoapp:add_review' dealer.id %}" method="post">
+            {% csrf_token %}
+            <div class="container">
+                <div class="form-group">
+                    <h2>Add a review about <strong>{{dealer}}</strong></h2>
+                    <br>
+                    <h6 class="text-dark"><strong>Enter the review content:</strong></h6>
+                    <textarea class="form-control" id="content" name="content" rows="2" required></textarea>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" name="purchasecheck" id="purchasecheck">
+                    <label class="form-check-label text-dark" for="purchasecheck">Have you purchased the car form {{dealer}}?</label>
+                    <label class="form-check-label" for="purchasecheck">(select purchased car information below if checked)</label>
+                </div>
+
+                <div class="form-group">
+                    <h6 class="text-dark"><strong>Select your car (model-make-year)</strong></h6>
+                    <select name="car" id="car" class="form-select" required>
+                        {% for car in cars %}
+                            <option selected value={{car.dealer_id}}> {{car.name}}-{{car.make.name}}-{{car.year|date:"Y" }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group" data-provide="datepicker">
+                    <label for="purchasedate">Select your purchase date:</label>
+                    <input class="date-own form-control" type="text" name="purchasedate" id="purchasedate">
+                </div>
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
     </body>
+    <script type="text/javascript">
+        $('.date-own').datepicker({
+           format: 'mm/dd/yyyy'
+         });
+    </script>
 </html>
